@@ -51,6 +51,7 @@ function makeNode(type) {
     node.setAttribute(k, v);
   });
 
+  console.log("children: ", children);
   children.forEach((child) => {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);
@@ -90,4 +91,12 @@ function ul(...args) {
 
 function li(...args) {
   return makeNode("li", ...args);
+}
+
+function img(...args) {
+  return makeNode("img", ...args);
+}
+
+function a(...args) {
+  return makeNode("a", ...args);
 }

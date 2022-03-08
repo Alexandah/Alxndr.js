@@ -1,7 +1,6 @@
 import DOMHopper from "./DOMHopper.js";
 import InputLanguage from "./InputLanguage.js";
 import KeyboardParser from "./KeyboardParser.js";
-import { addNode } from "./helpers.js";
 
 //First, parse to add onClick functions via classes
 //we must do this bc chrome hates inline js execution
@@ -16,17 +15,6 @@ Array.from(document.querySelectorAll(".alertOnRightClick")).forEach((node) => {
     alert("YOU HAVE RIGHT CLICKED");
   };
 });
-
-//to make book mark divs
-var li = document.createElement("li");
-li.setAttribute("noHop", "");
-var img = document.createElement("img");
-img.setAttribute("height", "16");
-img.setAttribute("width", "16");
-img.setAttribute("src", "");
-img.setAttribute("noHop", "");
-addNode(img, li);
-var a = document.createElement("");
 
 //Now, set up the DOMHopper
 var domHopper = new DOMHopper();

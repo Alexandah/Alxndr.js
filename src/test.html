@@ -2,32 +2,44 @@
 <html lang="en-us">
   <head>
     <title>Alxndr.js Demo</title>
-    <style></style>
+    <style>
+      .window {
+        border: 1px solid black;
+      }
+    </style>
   </head>
 
   <body>
     <script src="./Alxndr.js"></script>
     <script>
+      function bookmark(name, url) {
+        return li({ noHop: "" }, [
+          img({
+            src: "http://www.google.com/s2/favicons?domain=" + url,
+            height: "16",
+            width: "16",
+            noHop: "",
+          }),
+          a({ href: url }, name),
+        ]);
+      }
+
+      function section(title, content) {
+        return div([h2({ noHop: "" }, title), ...content]);
+      }
+
       alxndrDOM(
-        div({ class: ["window", "gigachad"] }, [
-          h1("hello I am a very cool kiddo"),
-          div([
-            p({ id: "random text" }, "This is some random text"),
+        div({ class: "window", tabindex: 1 }, [
+          h1({ noHop: "" }, "New Tab"),
+          section("Search", [p("fuck u")]),
+          section("Bookmarks", [
             ul([
-              li("this is a sexy list"),
-              li(
-                { class: "2ndBro", biggusdiccus: "" },
-                "this is a sexy list indeed, brother"
-              ),
+              bookmark("Google", "http://www.google.com"),
+              bookmark("Youtube", "http://www.youtube.com"),
             ]),
           ]),
-          p("kiss my tiny wiener"),
-          p("kiss my tiny wiener", { id: "69" }),
-          p({ id: "420" }, "kiss my tiny wiener"),
-          div({ height: "69" }, [
-            p(["reeeeee", p("skeet skeet yeet yeet")]),
-            p("reeeeeeee"),
-          ]),
+          section("To Do", [p("fuck u")]),
+          section("Misc", [p("fuck u")]),
         ])
       );
     </script>
