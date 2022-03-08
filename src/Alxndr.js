@@ -40,11 +40,21 @@ function makeNode(type) {
     switch (k) {
       case "class":
         if (Array.isArray(v)) {
-          var valsString = "";
+          let valsString = "";
           v.forEach((className) => {
             valsString += className + " ";
           });
           v = valsString;
+        }
+        break;
+      case "style":
+        if (typeof v == "string") break;
+        if (isStdObj(v)) {
+          let styleString = "style=";
+          Object.entries(v).forEach(([styleProp, styleVal]) => {
+            styleString += styleProp + "=" + styleVal + "; ";
+          });
+          v = styleString;
         }
         break;
     }
@@ -99,4 +109,8 @@ function img(...args) {
 
 function a(...args) {
   return makeNode("a", ...args);
+}
+
+function span(...args) {
+  return makeNode("span", ...args);
 }
