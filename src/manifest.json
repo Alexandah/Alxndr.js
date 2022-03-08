@@ -1,0 +1,10 @@
+{
+  "name": "Alexander's Personal New Tab Page",
+  "description": "Overrides the new tab page",
+  "version": "0.1",
+  "incognito": "split",
+  "chrome_url_overrides": {
+    "newtab": "new_tab.html"
+  },
+  "manifest_version": 2
+}
