@@ -64,11 +64,10 @@ class alxh1 extends AlxNode {
     this.isCool = false;
     this.domNode = h1(text);
     this.domNode.addEventListener("click", () => {
-      console.log("i have been clicked dear daddy");
       this.isCool = !this.isCool;
+      this.text = "REEEEEEEEEEEEEE";
     });
     this.render = () => {
-      console.log("rendering... ");
       this.domNode.innerHTML = this.text;
       this.domNode.style.border = this.isCool
         ? "5px solid orange"
@@ -127,6 +126,10 @@ function makeNode(type) {
           });
           v = styleString;
         }
+        break;
+      default:
+        const isEventListener = typeof k == "string" && k.indexOf("on") == 0;
+        if (isEventListener) node.addEventListener(k.substring(2), v);
         break;
     }
     node.setAttribute(k, v);
