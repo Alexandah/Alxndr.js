@@ -6,6 +6,77 @@ function isStdObj(obj) {
   return typeof obj === "object" && !Array.isArray(obj) && obj !== null;
 }
 
+class ProxyDOMNode {
+  constructor(varsIgnoringRender = []) {
+    this.domNode = null;
+    this.render = function () {};
+    this.destroy = function () {
+      this.domNode.parentNode.removeChild(this.domNode);
+      Object.keys(this).forEach((k) => {
+        delete this[k];
+      });
+    };
+    return new Proxy(this, {
+      set: (target, key, value) => {
+        target[key] = value;
+        switch (key) {
+          case "domNode":
+            break;
+          default:
+            let skipRender = varsIgnoringRender.includes(key);
+            if (skipRender) break;
+            this.render();
+        }
+        return true;
+      },
+    });
+  }
+}
+
+class AlxNode extends ProxyDOMNode {
+  constructor(children = []) {
+    super();
+    this.parent = null;
+    this.children = children;
+  }
+
+  adopt(alxNode) {
+    this.children.push(alxNode);
+    alxNode.parent = this;
+    this.domNode.appendChild(alxNode.domNode);
+  }
+
+  abandon(alxNode) {
+    var i = this.children.indexOf(alxNode);
+    const hasChild = i != -1;
+    if (hasChild) {
+      this.children.splice(i, 1);
+      alxNode.parent = null;
+      this.domNode.removeChild(alxNode.domNode);
+    }
+  }
+}
+
+class alxh1 extends AlxNode {
+  constructor(text) {
+    super();
+    this.text = text;
+    this.isCool = false;
+    this.domNode = h1(text);
+    this.domNode.addEventListener("click", () => {
+      console.log("i have been clicked dear daddy");
+      this.isCool = !this.isCool;
+    });
+    this.render = () => {
+      console.log("rendering... ");
+      this.domNode.innerHTML = this.text;
+      this.domNode.style.border = this.isCool
+        ? "5px solid orange"
+        : "5px solid black";
+    };
+  }
+}
+
 function makeNode(type) {
   //Allows last 2 arguments to be sent in flexible order without explicit name reference
   if (arguments.length > 3) throw "Alxndr.js Error: Too many arguments!";
@@ -61,7 +132,6 @@ function makeNode(type) {
     node.setAttribute(k, v);
   });
 
-  console.log("children: ", children);
   children.forEach((child) => {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);

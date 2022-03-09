@@ -30,18 +30,22 @@ export default class Stickynote {
       if (!parentOfNoteHolderIsPositioned)
         this.addInertPositioning(this.parentOfNoteHolder);
 
-      var noteHolderAttributes = { class: "noteHolder", noHop: "" };
-
       const mustManuallyRepositionNoteHolder =
         this.parentOfNoteHolder !== this.stuckOn;
-      if (mustManuallyRepositionNoteHolder)
-        noteHolderAttributes.style = {
-          position: "absolute",
-          top: this.stuckOn.offsetTop,
-          left: this.stuckOn.offsetLeft,
-        };
 
-      this.noteHolder = span(noteHolderAttributes, [note]);
+      this.noteHolder = span(
+        (() => {
+          let attr = { class: "noteHolder", noHop: "" };
+          if (mustManuallyRepositionNoteHolder)
+            attr.style = {
+              position: "absolute",
+              top: this.stuckOn.offsetTop,
+              left: this.stuckOn.offsetLeft,
+            };
+          return attr;
+        })(),
+        [note]
+      );
       addNode(this.noteHolder, this.parentOfNoteHolder);
     } else
       this.noteHolder = getChildWithClass(

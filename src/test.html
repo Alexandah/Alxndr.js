@@ -28,20 +28,23 @@
         return div([h2({ noHop: "" }, title), ...content]);
       }
 
-      alxndrDOM(
-        div({ class: "window", tabindex: 1 }, [
-          h1({ noHop: "" }, "New Tab"),
-          section("Search", [p("fuck u")]),
-          section("Bookmarks", [
-            ul([
-              bookmark("Google", "http://www.google.com"),
-              bookmark("Youtube", "http://www.youtube.com"),
-            ]),
+      var mainDiv = div({ class: "window", tabindex: 1 }, [
+        h1({ noHop: "" }, "New Tab"),
+        section("Search", [p("fuck u")]),
+        section("Bookmarks", [
+          ul([
+            bookmark("Google", "http://www.google.com"),
+            bookmark("Youtube", "http://www.youtube.com"),
           ]),
-          section("To Do", [p("fuck u")]),
-          section("Misc", [p("fuck u")]),
-        ])
-      );
+        ]),
+        section("To Do", [p("fuck u")]),
+        section("Misc", [p("fuck u")]),
+      ]);
+      console.log("mainDiv ", mainDiv);
+      var test = new alxh1("wassup boisss");
+      console.log("test ", test);
+      mainDiv.appendChild(test.domNode);
+      alxndrDOM(mainDiv);
     </script>
   </body>
 </html>
