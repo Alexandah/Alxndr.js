@@ -2,10 +2,6 @@ function alxndrDOM(root) {
   document.body.appendChild(root);
 }
 
-function isStdObj(obj) {
-  return typeof obj === "object" && !Array.isArray(obj) && obj !== null;
-}
-
 class ProxyDOMNode {
   constructor(varsIgnoringRender = []) {
     this.domNode = null;
@@ -76,6 +72,20 @@ class alxh1 extends AlxNode {
   }
 }
 
+function isStdObj(obj) {
+  return typeof obj === "object" && !Array.isArray(obj) && obj !== null;
+}
+
+//Returns true if it is a DOM node
+function isNode(o) {
+  return typeof Node === "object"
+    ? o instanceof Node
+    : o &&
+        typeof o === "object" &&
+        typeof o.nodeType === "number" &&
+        typeof o.nodeName === "string";
+}
+
 function makeNode(type) {
   //Allows last 2 arguments to be sent in flexible order without explicit name reference
   if (arguments.length > 3) throw "Alxndr.js Error: Too many arguments!";
@@ -83,7 +93,7 @@ function makeNode(type) {
   var children = null;
   for (var i = 1; i < arguments.length; i++) {
     let arg = arguments[i];
-    if (isStdObj(arg)) {
+    if (isStdObj(arg) && !isNode(arg)) {
       if (attributes != null)
         throw "Alxndr.js Error: Tried to set attributes twice.";
       attributes = arg;
@@ -120,7 +130,7 @@ function makeNode(type) {
       case "style":
         if (typeof v == "string") break;
         if (isStdObj(v)) {
-          let styleString = "style=";
+          let styleString = "";
           Object.entries(v).forEach(([styleProp, styleVal]) => {
             styleString += styleProp + "=" + styleVal + "; ";
           });
@@ -186,4 +196,16 @@ function a(...args) {
 
 function span(...args) {
   return makeNode("span", ...args);
+}
+
+function form(...args) {
+  return makeNode("form", ...args);
+}
+
+function input(...args) {
+  return makeNode("input", ...args);
+}
+
+function sub(...args) {
+  return makeNode("sub", ...args);
 }
