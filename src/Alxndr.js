@@ -132,7 +132,7 @@ function makeNode(type) {
         if (isStdObj(v)) {
           let styleString = "";
           Object.entries(v).forEach(([styleProp, styleVal]) => {
-            styleString += styleProp + "=" + styleVal + "; ";
+            styleString += styleProp + ":" + styleVal + "; ";
           });
           v = styleString;
         }
