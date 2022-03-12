@@ -114,7 +114,9 @@ function makeNode(type) {
   if (attributes == null) attributes = {};
   if (children == null) children = [];
 
-  var node = document.createElement(type);
+  if (NSElements.includes(type))
+    var node = document.createElementNS("http://www.w3.org/2000/svg", type);
+  else var node = document.createElement(type);
 
   Object.entries(attributes).forEach(([k, v]) => {
     switch (k) {
@@ -208,4 +210,13 @@ function input(...args) {
 
 function sub(...args) {
   return makeNode("sub", ...args);
+}
+
+const NSElements = ["svg", "path"];
+function svg(...args) {
+  return makeNode("svg", ...args);
+}
+
+function path(...args) {
+  return makeNode("path", ...args);
 }

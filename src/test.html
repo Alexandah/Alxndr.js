@@ -42,19 +42,38 @@
           p("fuck u"),
           div(
             {
+              id: "btn_delar",
               style: {
                 width: "100px",
                 height: "100px",
                 border: "3px solid orange",
               },
-              onclick: () => alert("eat my penis"),
+              // onclick: () => alert("arrows yeeted"),
             },
-            ["fuck ur mummy"]
+            ["I yeet arrows"]
           ),
         ]),
+        div(
+          {
+            style: {
+              width: "500px",
+              height: "500px",
+              border: "2px solid black",
+            },
+          },
+          svg(
+            { width: "400", height: "400" },
+            path({
+              d: "M100 100 L300 100",
+              stroke: "blue",
+              "stroke-width": 5,
+            })
+          )
+        ),
       ]);
       console.log("mainDiv ", mainDiv);
       alxndrDOM(mainDiv);
     </script>
+    <script src="./ArrowDrawer.js"></script>
   </body>
 </html>
