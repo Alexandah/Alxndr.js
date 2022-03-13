@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Alxndr.js Demo</title>
+    <style>
+      .window {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="./Alxndr.js"></script>
+    <script>
+      var testnode = new ProxyDOMNode(p("I love you!"));
+      console.log("proxy: ", testnode);
+      console.log("real node: ", testnode.node);
+      console.log("style: ", testnode.style);
+      testnode.style = { border: "3px solid orange" };
+      console.log("updated style: ", testnode.style);
+      alxndrDOM([div({ class: "window" }, p("hello!")), testnode.node]);
+      testnode.fuckoff = true;
+      console.log(testnode.fuckoff);
+      testnode.style = { border: "1px solid black" };
+    </script>
+  </body>
+</html>

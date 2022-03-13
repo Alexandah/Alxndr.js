@@ -1,8 +1,45 @@
-function alxndrDOM(root) {
-  document.body.appendChild(root);
+function isStdObj(obj) {
+  return typeof obj === "object" && !Array.isArray(obj) && obj !== null;
+}
+
+//Returns true if it is a DOM node
+function isNode(o) {
+  return typeof Node === "object"
+    ? o instanceof Node
+    : o &&
+        typeof o === "object" &&
+        typeof o.nodeType === "number" &&
+        typeof o.nodeName === "string";
+}
+
+function alxndrDOM(bodyChildren) {
+  if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
+  bodyChildren.forEach((child) => document.body.appendChild(child));
 }
 
 class ProxyDOMNode {
+  constructor(domNode) {
+    return new Proxy(domNode, {
+      set: (target, key, value) => {
+        if (key in target) {
+          if (key == "style" && isStdObj(value))
+            Object.entries(value).forEach(([k, v]) => {
+              target.style[k] = v;
+            });
+          else target[key] = value;
+        } else target.setAttribute(key, value);
+        return true;
+      },
+      get: (target, key) => {
+        if (key == "node") return target;
+        if (key in target) return target[key];
+        else return target.getAttribute(key);
+      },
+    });
+  }
+}
+
+class AlxNode {
   constructor(varsIgnoringRender = []) {
     //this is a proxy
     this.domNode = null;
@@ -64,62 +101,48 @@ class ProxyDOMNode {
   }
 }
 
-class AlxNode extends ProxyDOMNode {
-  constructor(children = []) {
-    super();
-    this.parent = null;
-    this.children = children;
-  }
+// class AlxNode extends ProxyDOMNode {
+//   constructor(children = []) {
+//     super();
+//     this.parent = null;
+//     this.children = children;
+//   }
 
-  adopt(alxNode) {
-    this.children.push(alxNode);
-    alxNode.parent = this;
-    this.domNode.appendChild(alxNode.domNode);
-  }
+//   adopt(alxNode) {
+//     this.children.push(alxNode);
+//     alxNode.parent = this;
+//     this.domNode.appendChild(alxNode.domNode);
+//   }
 
-  abandon(alxNode) {
-    var i = this.children.indexOf(alxNode);
-    const hasChild = i != -1;
-    if (hasChild) {
-      this.children.splice(i, 1);
-      alxNode.parent = null;
-      this.domNode.removeChild(alxNode.domNode);
-    }
-  }
-}
+//   abandon(alxNode) {
+//     var i = this.children.indexOf(alxNode);
+//     const hasChild = i != -1;
+//     if (hasChild) {
+//       this.children.splice(i, 1);
+//       alxNode.parent = null;
+//       this.domNode.removeChild(alxNode.domNode);
+//     }
+//   }
+// }
 
-class alxh1 extends AlxNode {
-  constructor(text) {
-    super();
-    this.text = text;
-    this.isCool = false;
-    this.domNode = h1(text);
-    this.domNode.addEventListener("click", () => {
-      this.isCool = !this.isCool;
-      this.text = "REEEEEEEEEEEEEE";
-    });
-    this.render = () => {
-      this.domNode.innerHTML = this.text;
-      this.domNode.style.border = this.isCool
-        ? "5px solid orange"
-        : "5px solid black";
-    };
-  }
-}
-
-function isStdObj(obj) {
-  return typeof obj === "object" && !Array.isArray(obj) && obj !== null;
-}
-
-//Returns true if it is a DOM node
-function isNode(o) {
-  return typeof Node === "object"
-    ? o instanceof Node
-    : o &&
-        typeof o === "object" &&
-        typeof o.nodeType === "number" &&
-        typeof o.nodeName === "string";
-}
+// class alxh1 extends AlxNode {
+//   constructor(text) {
+//     super();
+//     this.text = text;
+//     this.isCool = false;
+//     this.domNode = h1(text);
+//     this.domNode.addEventListener("click", () => {
+//       this.isCool = !this.isCool;
+//       this.text = "REEEEEEEEEEEEEE";
+//     });
+//     this.render = () => {
+//       this.domNode.innerHTML = this.text;
+//       this.domNode.style.border = this.isCool
+//         ? "5px solid orange"
+//         : "5px solid black";
+//     };
+//   }
+// }
 
 function makeNode(type) {
   //Allows last 2 arguments to be sent in flexible order without explicit name reference
