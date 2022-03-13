@@ -2,10 +2,14 @@ function alxndrDOM(root) {
   document.body.appendChild(root);
 }
 
-var nextId = -1;
 class ProxyDOMNode {
   constructor(varsIgnoringRender = []) {
+    //this is a proxy
     this.domNode = null;
+    //this is the actual dom node.
+    //it should not be referenced directly,
+    //but can instead be accessed by trying to get the domNode attribute.
+    this._realDOMNode = null;
     this.render = function () {};
     this.destroy = function () {
       this.domNode.parentNode.removeChild(this.domNode);
@@ -16,27 +20,47 @@ class ProxyDOMNode {
     return new Proxy(this, {
       set: (target, key, value) => {
         console.log("in proxy: ", key, value);
-        target[key] = value;
         switch (key) {
           case "domNode":
-            // target[key] = new Proxy(value, {
-            //   set: (domTarget, domKey, domVal) => {
-            //     domTarget.id = nextId++;
-            //     document
-            //       .getElementById(domTarget.id)
-            //       .setAttribute(domKey, domVal);
-            //   },
-            // });
+            this._realDOMNode = value;
+            target[key] = new Proxy(value, {
+              set: (domTarget, domKey, domVal) => {
+                console.log("setting attr of dom node");
+                domTarget.setAttribute(domKey, domVal);
+                return true;
+              },
+            });
             break;
           default:
-            let skipRender = varsIgnoringRender.includes(key);
-            if (skipRender) break;
-            if (this.domNode == null) break;
-            this.render();
+            if (isStdObj(value))
+              target[key] = new Proxy(value, {
+                set: (objTarget, objKey, objVal) => {
+                  console.log("setting proxyied obj");
+                  objTarget[objKey] = objVal;
+                  this.tryRender(key, varsIgnoringRender);
+                  return true;
+                },
+              });
+            else {
+              target[key] = value;
+              this.tryRender(key, varsIgnoringRender);
+            }
+            break;
         }
         return true;
       },
+      get: (target, key) => {
+        if (key == "domNode") return this._realDOMNode;
+        else return target[key];
+      },
     });
+  }
+
+  tryRender(key, varsIgnoringRender) {
+    console.log("trying render");
+    let skipRender = this.domNode == null || varsIgnoringRender.includes(key);
+    if (skipRender) return;
+    this.render();
   }
 }
 
@@ -162,6 +186,7 @@ function makeNode(type) {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);
     else toAdd = child;
+    console.log("adding child ", toAdd, " to ", node);
     node.appendChild(toAdd);
   });
   return node;

@@ -61,27 +61,27 @@
             console.log("rendering");
             // console.log(this.domNode.attributes);
             // console.log(this.domNode.attributes.d);
-            this.domNode.setAttribute(
-              "d",
-              "M" +
-                this.start.x +
-                " " +
-                this.start.y +
-                " L" +
-                this.end.x +
-                " " +
-                this.end.y
-            );
-            console.log(this.domNode);
-            // this.domNode.d =
+            // this.domNode.setAttribute(
+            //   "d",
             //   "M" +
-            //   this.start.x +
-            //   " " +
-            //   this.start.y +
-            //   " L" +
-            //   this.end.x +
-            //   " " +
-            //   this.end.y;
+            //     this.start.x +
+            //     " " +
+            //     this.start.y +
+            //     " L" +
+            //     this.end.x +
+            //     " " +
+            //     this.end.y
+            // );
+            this.domNode.d =
+              "M" +
+              this.start.x +
+              " " +
+              this.start.y +
+              " L" +
+              this.end.x +
+              " " +
+              this.end.y;
+            console.log(this.domNode);
           };
         }
       }
@@ -112,12 +112,14 @@
                 border: "3px solid orange",
               },
               onclick: () => {
+                console.log("clicked!");
                 console.log(dynamicArrow);
-                // dynamicArrow.end.y += 20;
-                dynamicArrow.end = {
-                  x: dynamicArrow.end.x,
-                  y: dynamicArrow.end.y + 20,
-                };
+                console.log(dynamicArrow.end);
+                dynamicArrow.end.y += 20;
+                // dynamicArrow.end = {
+                //   x: dynamicArrow.end.x,
+                //   y: dynamicArrow.end.y + 20,
+                // };
               },
             },
             ["I yeet arrows"]
