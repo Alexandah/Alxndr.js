@@ -2,6 +2,7 @@ function alxndrDOM(root) {
   document.body.appendChild(root);
 }
 
+var nextId = -1;
 class ProxyDOMNode {
   constructor(varsIgnoringRender = []) {
     this.domNode = null;
@@ -14,13 +15,23 @@ class ProxyDOMNode {
     };
     return new Proxy(this, {
       set: (target, key, value) => {
+        console.log("in proxy: ", key, value);
         target[key] = value;
         switch (key) {
           case "domNode":
+            // target[key] = new Proxy(value, {
+            //   set: (domTarget, domKey, domVal) => {
+            //     domTarget.id = nextId++;
+            //     document
+            //       .getElementById(domTarget.id)
+            //       .setAttribute(domKey, domVal);
+            //   },
+            // });
             break;
           default:
             let skipRender = varsIgnoringRender.includes(key);
             if (skipRender) break;
+            if (this.domNode == null) break;
             this.render();
         }
         return true;
@@ -212,11 +223,23 @@ function sub(...args) {
   return makeNode("sub", ...args);
 }
 
-const NSElements = ["svg", "path"];
+const NSElements = ["svg", "path", "defs", "marker", "polygon"];
 function svg(...args) {
   return makeNode("svg", ...args);
 }
 
 function path(...args) {
   return makeNode("path", ...args);
+}
+
+function defs(...args) {
+  return makeNode("defs", ...args);
+}
+
+function marker(...args) {
+  return makeNode("marker", ...args);
+}
+
+function polygon(...args) {
+  return makeNode("polygon", ...args);
 }
