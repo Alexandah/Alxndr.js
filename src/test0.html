@@ -12,16 +12,64 @@
   <body>
     <script src="./Alxndr.js"></script>
     <script>
-      var testnode = new ProxyDOMNode(p("I love you!"));
-      console.log("proxy: ", testnode);
-      console.log("real node: ", testnode.node);
-      console.log("style: ", testnode.style);
-      testnode.style = { border: "3px solid orange" };
-      console.log("updated style: ", testnode.style);
-      alxndrDOM([div({ class: "window" }, p("hello!")), testnode.node]);
-      testnode.fuckoff = true;
-      console.log(testnode.fuckoff);
-      testnode.style = { border: "1px solid black" };
+      class MovingDiv extends AlxNode {
+        constructor(text, startPos, moveAmt = 20) {
+          super(
+            div(
+              {
+                class: "window",
+                style: {
+                  position: "fixed",
+                  left: startPos.x,
+                  top: startPos.y,
+                },
+              },
+              text
+            )
+          );
+          this.x = startPos.x;
+          this.y = startPos.y;
+          this.moveAmt = moveAmt;
+          this.render = () => {
+            this.nodeData.style = { left: this.x + "px", top: this.y + "px" };
+          };
+        }
+
+        moveUp() {
+          this.y -= this.moveAmt;
+        }
+        moveDown() {
+          this.y += this.moveAmt;
+        }
+        moveLeft() {
+          this.x -= this.moveAmt;
+        }
+        moveRight() {
+          this.x += this.moveAmt;
+        }
+      }
+
+      var movingDiv = new MovingDiv("I like to move it move it!", {
+        x: 100,
+        y: 100,
+      });
+
+      function controlButton(text, moveFunc) {
+        return div(
+          {
+            class: "window",
+            onclick: moveFunc,
+          },
+          text
+        );
+      }
+      alxndrDOM([
+        controlButton("UP", () => movingDiv.moveUp()),
+        controlButton("DOWN", () => movingDiv.moveDown()),
+        controlButton("LEFT", () => movingDiv.moveLeft()),
+        controlButton("RIGHT", () => movingDiv.moveRight()),
+        movingDiv.node,
+      ]);
     </script>
   </body>
 </html>
