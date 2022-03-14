@@ -219,6 +219,10 @@ function sub(...args) {
   return makeNode("sub", ...args);
 }
 
+function button(...args) {
+  return makeNode("button", ...args);
+}
+
 const NSElements = ["svg", "path", "defs", "marker", "polygon"];
 function svg(...args) {
   return makeNode("svg", ...args);

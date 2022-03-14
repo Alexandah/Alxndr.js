@@ -27,11 +27,18 @@
               text
             )
           );
+          this.nodeData.onclick = () => this.changeColor();
           this.x = startPos.x;
           this.y = startPos.y;
+          this.flash = false;
           this.moveAmt = moveAmt;
           this.render = () => {
-            this.nodeData.style = { left: this.x + "px", top: this.y + "px" };
+            let border = this.flash ? "3px solid orange" : "1px solid black";
+            this.nodeData.style = {
+              left: this.x + "px",
+              top: this.y + "px",
+              border: border,
+            };
           };
         }
 
@@ -47,6 +54,10 @@
         moveRight() {
           this.x += this.moveAmt;
         }
+
+        changeColor() {
+          this.flash = !this.flash;
+        }
       }
 
       var movingDiv = new MovingDiv("I like to move it move it!", {
@@ -54,20 +65,22 @@
         y: 100,
       });
 
-      function controlButton(text, moveFunc) {
-        return div(
+      function controlButton(text, func) {
+        return button(
           {
             class: "window",
-            onclick: moveFunc,
+            onclick: func,
           },
           text
         );
       }
+
       alxndrDOM([
         controlButton("UP", () => movingDiv.moveUp()),
         controlButton("DOWN", () => movingDiv.moveDown()),
         controlButton("LEFT", () => movingDiv.moveLeft()),
         controlButton("RIGHT", () => movingDiv.moveRight()),
+        controlButton("DELETE", () => movingDiv.destroy()),
         movingDiv.node,
       ]);
     </script>
