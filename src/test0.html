@@ -13,7 +13,7 @@
     <script src="./Alxndr.js"></script>
     <script>
       class MovingDiv extends AlxNode {
-        constructor(text, startPos, moveAmt = 20) {
+        constructor(startPos, children = [], moveAmt = 20) {
           super(
             div(
               {
@@ -24,7 +24,7 @@
                   top: startPos.y,
                 },
               },
-              text
+              children
             )
           );
           this.nodeData.onclick = () => this.changeColor();
@@ -60,10 +60,31 @@
         }
       }
 
-      var movingDiv = new MovingDiv("I like to move it move it!", {
-        x: 100,
-        y: 100,
-      });
+      class FlashingDiv extends AlxNode {
+        constructor(color0, color1, interval = 100) {
+          super(div("I like seizures"));
+          this.color0 = color0;
+          this.color1 = color1;
+          this.activeColor = this.color0;
+          this.render = () => {
+            this.nodeData.style = { border: "3px solid " + this.activeColor };
+          };
+          setInterval(() => this.switchColor(), interval);
+        }
+
+        switchColor() {
+          if (this.activeColor == this.color0) this.activeColor = this.color1;
+          else this.activeColor = this.color0;
+        }
+      }
+
+      var movingDiv = new MovingDiv(
+        {
+          x: 100,
+          y: 100,
+        },
+        ["I like to move it move it!", new FlashingDiv("black", "orange").node]
+      );
 
       function controlButton(text, func) {
         return button(
