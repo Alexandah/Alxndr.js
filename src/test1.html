@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Alxndr.js Demo</title>
+    <style>
+      .window {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="./Alxndr.js"></script>
+    <script type="module">
+      import { Graph } from "./Graph.js";
+      var graph = new Graph(500, 500);
+      var a = graph.addNode(p("Yeet"), { x: 100, y: 100 });
+      var b = graph.addNode(p("Feet"), { x: 300, y: 300 });
+      var ab = graph.addEdge(a, b);
+      a.position.x = 300;
+      var c = graph.addNode(p("Meet"), { x: 100, y: 200 });
+      var cb = graph.addEdge(c, b);
+      alxndrDOM(graph.view);
+      console.log("node states after dom call: ", a, b, c);
+      console.log("edge states after dom call: ", ab, cb);
+      setTimeout(() => {
+        graph.removeNode(b);
+        console.log("node states after delete call: ", a, b, c);
+        console.log("edge states after delete call: ", ab, cb);
+      }, 2000);
+    </script>
+  </body>
+</html>
