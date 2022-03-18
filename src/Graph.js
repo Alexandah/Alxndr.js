@@ -1,10 +1,5 @@
 import "./Alxndr.js";
 
-function removeItemFromArray(item, array) {
-  const i = array.indexOf(item);
-  if (i != -1) array.splice(i, 1);
-}
-
 class GraphNode extends AlxNode {
   constructor(content, startPos = { x: 0, y: 0 }) {
     super(
@@ -20,9 +15,6 @@ class GraphNode extends AlxNode {
         left: this.position.x + "px",
         top: this.position.y + "px",
       };
-      this.connectedEdges.forEach((edge) => {
-        edge.render();
-      });
     };
   }
 }
@@ -40,7 +32,16 @@ class GraphEdge extends AlxNode {
     super(arrow(fromNode.position, toNode.position));
     this.fromNode = fromNode;
     this.toNode = toNode;
+    this.dependsOn(this.fromNode);
+    this.dependsOn(this.toNode);
     this.render = () => {
+      console.log(
+        "rendering edge ",
+        this,
+        " attached to nodes ",
+        toNode,
+        fromNode
+      );
       this.nodeData.d =
         "M" +
         this.fromNode.position.x +
@@ -102,24 +103,46 @@ export class Graph {
     return node;
   }
   removeNode(node) {
+    console.log("removing node ", node);
+    console.log(this.nodes);
+    console.log(this.edges);
     const nodeIndex = this.nodes.indexOf(node);
     const hasNode = nodeIndex != -1;
     if (hasNode) {
-      console.log(node.connectedEdges);
-      node.connectedEdges.forEach((edge) => this.removeEdge(edge));
+      console.log(node.connectedEdges.length);
+      console.log("connnected edges ", node.connectedEdges);
+      node.connectedEdges.forEach((edge) => {
+        console.log(edge);
+        this.removeEdge(edge);
+      });
+      console.log(
+        "connnected edges after 1st removal loop ",
+        node.connectedEdges,
+        typeof node.connectedEdges
+      );
+      node.connectedEdges.forEach((edge) => {
+        console.log(edge);
+        this.removeEdge(edge);
+      });
+      console.log(node.connectedEdges.length);
+      console.log(
+        "connnected edges after 2nd removal loop ",
+        node.connectedEdges,
+        typeof node.connectedEdges
+      );
       this.nodes.splice(nodeIndex, 1);
       node.destroy();
     }
+    console.log(this.nodes);
+    console.log(this.edges);
   }
 
   addEdge(from, to) {
-    console.log("adding edge");
     var edge = new GraphEdge(from, to);
-    from.connectedEdges.push(edge);
-    to.connectedEdges.push(edge);
+    edge.fromNode.connectedEdges.push(edge);
+    edge.toNode.connectedEdges.push(edge);
     this.edges.push(edge);
     this.drawRegion.appendChild(edge.node);
-    console.log("result: ", from, to);
     return edge;
   }
   removeEdge(edge) {

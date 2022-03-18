@@ -13,6 +13,11 @@ function isNode(o) {
         typeof o.nodeName === "string";
 }
 
+function removeItemFromArray(item, array) {
+  const i = array.indexOf(item);
+  if (i != -1) array.splice(i, 1);
+}
+
 //Attaches nodes to the document body
 function alxndrDOM(bodyChildren) {
   if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
@@ -43,24 +48,40 @@ class ProxyDOMNode {
   }
 }
 
+//THIS SHOULD NOT BE TOUCHED BY ANYONE ELSE EXCEPT ALXNODE
+var AlxndrDOM = {
+  root: document.body,
+  alxNodes: {},
+};
+
 //Supports dynamic dom nodes.
 //Allows associating non-dom variables with a domnode,
 //and automatically translates them into dom var changes
 //whenever they are set via a user defined render function.
+var newId = 0;
 class AlxNode {
   constructor(node) {
+    this.id = newId++;
     this.nodeData = new ProxyDOMNode(node);
     this.render = function () {};
     this.destroy = function () {
+      this.onDestroy();
+      this.removeAllDependencies();
+      delete AlxndrDOM.alxNodes[this.id];
+      console.log("destroying ", this);
+      console.log("found parent ", this.nodeData.parentNode);
       this.nodeData.parentNode.removeChild(this.nodeData.node);
       Object.keys(this).forEach((k) => {
         delete this[k];
       });
     };
-    return new Proxy(this, {
+    const sike = new Proxy(this, {
       set: (target, key, value) => {
         switch (key) {
           case "nodeData":
+          case "node":
+          case "id":
+          case "destroy":
             break;
           default:
             if (isStdObj(value))
@@ -84,12 +105,46 @@ class AlxNode {
         else return target[key];
       },
     });
+
+    AlxndrDOM.alxNodes[this.id] = { alxNode: sike, updateCausesRenderOf: [] };
+    return sike;
   }
+
+  onDestroy() {}
 
   tryRender() {
     let skipRender = this.nodeData == null;
     if (skipRender) return;
     this.render();
+    console.log("rendered node: ", this);
+    if (this.id in AlxndrDOM.alxNodes) {
+      const whoElseToRender = AlxndrDOM.alxNodes[this.id].updateCausesRenderOf;
+      console.log("rendering dependants: ", whoElseToRender[0]);
+      whoElseToRender.forEach((alxNode) => {
+        alxNode.render();
+      });
+    }
+  }
+
+  dependsOn(alxNode) {
+    AlxndrDOM.alxNodes[alxNode.id].updateCausesRenderOf.push(this);
+  }
+  doesNotDependOn(alxNode) {
+    if (alxNode == null) return;
+    if (alxNode == undefined) return;
+    if (alxNode.id == undefined) return;
+    removeItemFromArray(
+      this,
+      AlxndrDOM.alxNodes[alxNode.id].updateCausesRenderOf
+    );
+  }
+  removeAllDependencies() {
+    AlxndrDOM.alxNodes[this.id].updateCausesRenderOf.forEach((alxNode) =>
+      this.doesNotDependOn(alxNode)
+    );
+    Object.values(AlxndrDOM.alxNodes).forEach((x) => {
+      x.alxNode.doesNotDependOn(this);
+    });
   }
 }
 

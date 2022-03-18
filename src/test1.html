@@ -17,17 +17,23 @@
       var a = graph.addNode(p("Yeet"), { x: 100, y: 100 });
       var b = graph.addNode(p("Feet"), { x: 300, y: 300 });
       var ab = graph.addEdge(a, b);
-      a.position.x = 300;
-      var c = graph.addNode(p("Meet"), { x: 100, y: 200 });
-      var cb = graph.addEdge(c, b);
       alxndrDOM(graph.view);
-      console.log("node states after dom call: ", a, b, c);
-      console.log("edge states after dom call: ", ab, cb);
-      setTimeout(() => {
-        graph.removeNode(b);
-        console.log("node states after delete call: ", a, b, c);
-        console.log("edge states after delete call: ", ab, cb);
-      }, 2000);
+      a.position.x += 100;
+      b.position.x += 100;
+      var c = graph.addNode(p("hello dolly"), { x: 200, y: 200 });
+      var bc = graph.addEdge(b, c);
+      c.position.x -= 100;
+      graph.removeNode(c);
+      var d = graph.addNode(p("heres johnny"));
+      var e = graph.addNode(p("heres timmy"), { x: 200, y: 200 });
+      var f = graph.addNode(p("heres zimmy"), { x: 100, y: 200 });
+      var ad = graph.addEdge(a, d);
+      var ed = graph.addEdge(e, d);
+      var fd = graph.addEdge(f, d);
+      graph.removeNode(d);
+      console.log("finished removing d");
+      e.position.y += 100;
+      console.log(graph.edges);
     </script>
   </body>
 </html>
