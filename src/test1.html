@@ -14,26 +14,13 @@
     <script type="module">
       import { Graph } from "./Graph.js";
       var graph = new Graph(500, 500);
-      var a = graph.addNode(p("Yeet"), { x: 100, y: 100 });
-      var b = graph.addNode(p("Feet"), { x: 300, y: 300 });
-      var ab = graph.addEdge(a, b);
-      alxndrDOM(graph.view);
-      a.position.x += 100;
-      b.position.x += 100;
-      var c = graph.addNode(p("hello dolly"), { x: 200, y: 200 });
+      var a = graph.addNode("0", { x: 50, y: 100 });
+      var b = graph.addNode("1", { x: 100, y: 100 });
+      var c = graph.addNode("2", { x: 75, y: 200 });
+      var ac = graph.addEdge(a, c);
       var bc = graph.addEdge(b, c);
-      c.position.x -= 100;
       graph.removeNode(c);
-      var d = graph.addNode(p("heres johnny"));
-      var e = graph.addNode(p("heres timmy"), { x: 200, y: 200 });
-      var f = graph.addNode(p("heres zimmy"), { x: 100, y: 200 });
-      var ad = graph.addEdge(a, d);
-      var ed = graph.addEdge(e, d);
-      var fd = graph.addEdge(f, d);
-      graph.removeNode(d);
-      console.log("finished removing d");
-      e.position.y += 100;
-      console.log(graph.edges);
+      alxndrDOM(graph.view);
     </script>
   </body>
 </html>

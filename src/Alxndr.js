@@ -68,8 +68,6 @@ class AlxNode {
       this.onDestroy();
       this.removeAllDependencies();
       delete AlxndrDOM.alxNodes[this.id];
-      console.log("destroying ", this);
-      console.log("found parent ", this.nodeData.parentNode);
       this.nodeData.parentNode.removeChild(this.nodeData.node);
       Object.keys(this).forEach((k) => {
         delete this[k];
@@ -116,10 +114,8 @@ class AlxNode {
     let skipRender = this.nodeData == null;
     if (skipRender) return;
     this.render();
-    console.log("rendered node: ", this);
     if (this.id in AlxndrDOM.alxNodes) {
       const whoElseToRender = AlxndrDOM.alxNodes[this.id].updateCausesRenderOf;
-      console.log("rendering dependants: ", whoElseToRender[0]);
       whoElseToRender.forEach((alxNode) => {
         alxNode.render();
       });

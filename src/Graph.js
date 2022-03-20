@@ -35,13 +35,6 @@ class GraphEdge extends AlxNode {
     this.dependsOn(this.fromNode);
     this.dependsOn(this.toNode);
     this.render = () => {
-      console.log(
-        "rendering edge ",
-        this,
-        " attached to nodes ",
-        toNode,
-        fromNode
-      );
       this.nodeData.d =
         "M" +
         this.fromNode.position.x +
@@ -103,38 +96,16 @@ export class Graph {
     return node;
   }
   removeNode(node) {
-    console.log("removing node ", node);
-    console.log(this.nodes);
-    console.log(this.edges);
     const nodeIndex = this.nodes.indexOf(node);
     const hasNode = nodeIndex != -1;
     if (hasNode) {
-      console.log(node.connectedEdges.length);
-      console.log("connnected edges ", node.connectedEdges);
-      node.connectedEdges.forEach((edge) => {
-        console.log(edge);
-        this.removeEdge(edge);
-      });
-      console.log(
-        "connnected edges after 1st removal loop ",
-        node.connectedEdges,
-        typeof node.connectedEdges
-      );
-      node.connectedEdges.forEach((edge) => {
-        console.log(edge);
-        this.removeEdge(edge);
-      });
-      console.log(node.connectedEdges.length);
-      console.log(
-        "connnected edges after 2nd removal loop ",
-        node.connectedEdges,
-        typeof node.connectedEdges
-      );
+      //creating copy bc otherwise the list we are removing from is trimmed as we go,
+      //causing early termination and failure to remove some edges
+      const edgesToRemove = node.connectedEdges.map((edge) => edge);
+      edgesToRemove.forEach((edge) => this.removeEdge(edge));
       this.nodes.splice(nodeIndex, 1);
       node.destroy();
     }
-    console.log(this.nodes);
-    console.log(this.edges);
   }
 
   addEdge(from, to) {
@@ -145,11 +116,10 @@ export class Graph {
     this.drawRegion.appendChild(edge.node);
     return edge;
   }
+
   removeEdge(edge) {
-    console.log("attempting to remove edge ", edge);
     const edgeIndex = this.edges.indexOf(edge);
     const hasEdge = edgeIndex != -1;
-    console.log("hasEdge? ", hasEdge);
     if (hasEdge) {
       removeItemFromArray(edge, edge.fromNode.connectedEdges);
       removeItemFromArray(edge, edge.toNode.connectedEdges);
