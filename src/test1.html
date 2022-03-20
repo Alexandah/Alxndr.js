@@ -6,6 +6,10 @@
       .window {
         border: 1px solid black;
       }
+      html,
+      body {
+        height: 100%;
+      }
     </style>
   </head>
 
@@ -17,8 +21,23 @@
       var b = graph.addNode("1", { x: 100, y: 100 });
       var c = graph.addNode("2", { x: 75, y: 200 });
       var bc = graph.addEdge(b, c);
-      // alxndrDOM(graph.view);
-      alxndrDOM(div([p("yeet"), graph.view]));
+      alxndrDOM([
+        nav(
+          {
+            style: {
+              float: "left",
+              background: "#FAFAFA",
+              border: "1px solid black",
+              width: "15%",
+              height: "100%",
+              padding: "20px",
+              margin: "3px",
+            },
+          },
+          [h2("To Do")]
+        ),
+        div({ style: { float: "left" } }, graph.view),
+      ]);
     </script>
   </body>
 </html>
