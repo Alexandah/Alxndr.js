@@ -14,16 +14,17 @@
   </head>
 
   <body>
-    <script src="./Alxndr.js"></script>
-    <script type="module">
+    <script noHop src="./Alxndr.js"></script>
+    <script noHop type="module">
       import { Graph } from "./Graph.js";
-      var graph = new Graph(500, 500);
+      var graph = new Graph(screen.width * 0.7, 1000);
       var b = graph.addNode("1", { x: 100, y: 100 });
       var c = graph.addNode("2", { x: 75, y: 200 });
       var bc = graph.addEdge(b, c);
       alxndrDOM([
         nav(
           {
+            id: "domHopperStart",
             style: {
               float: "left",
               background: "#FAFAFA",
@@ -34,10 +35,37 @@
               margin: "3px",
             },
           },
-          [h2("To Do")]
+          [
+            h1("ToDoGraph"),
+            h2("Actions"),
+            ul([
+              li(
+                button(
+                  {
+                    onclick: () => {
+                      console.log("yeet");
+                    },
+                  },
+                  "fuck off"
+                )
+              ),
+            ]),
+            h2("To Do"),
+            ul([
+              li(a({ href: "http://shrek.gov" }, "shrek is love and life")),
+              li(a({ href: "http://shrek.gov" }, "shrek is love and life")),
+              li(a({ href: "http://shrek.gov" }, "shrek is love and life")),
+              li(a({ href: "http://shrek.gov" }, "shrek is love and life")),
+            ]),
+          ]
         ),
-        div({ style: { float: "left" } }, graph.view),
+        div({ style: { float: "left", border: "1px solid red" } }, graph.view),
       ]);
     </script>
+    <script
+      noHop
+      type="module"
+      src="https://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype@b05b25ec548bef54b5312bbd66e78d47a653efe2/DOMHopper/src/DOMHopperControls.js"
+    ></script>
   </body>
 </html>

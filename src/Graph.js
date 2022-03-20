@@ -29,7 +29,7 @@ function arrow(start, end, width = 3, color = "black") {
 }
 class GraphEdge extends AlxNode {
   constructor(fromNode, toNode) {
-    super(arrow(fromNode.position, toNode.position));
+    super(arrow(fromNode.position, toNode.position, 1));
     this.fromNode = fromNode;
     this.toNode = toNode;
     this.dependsOn(this.fromNode);
