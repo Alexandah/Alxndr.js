@@ -214,83 +214,31 @@ function makeNode(type) {
   return node;
 }
 
-function h1(...args) {
-  return makeNode("h1", ...args);
-}
-
-function h2(...args) {
-  return makeNode("h2", ...args);
-}
-
-function h3(...args) {
-  return makeNode("h3", ...args);
-}
-
-function h4(...args) {
-  return makeNode("h4", ...args);
-}
-
-function div(...args) {
-  return makeNode("div", ...args);
-}
-
-function p(...args) {
-  return makeNode("p", ...args);
-}
-
-function ul(...args) {
-  return makeNode("ul", ...args);
-}
-
-function li(...args) {
-  return makeNode("li", ...args);
-}
-
-function img(...args) {
-  return makeNode("img", ...args);
-}
-
-function a(...args) {
-  return makeNode("a", ...args);
-}
-
-function span(...args) {
-  return makeNode("span", ...args);
-}
-
-function form(...args) {
-  return makeNode("form", ...args);
-}
-
-function input(...args) {
-  return makeNode("input", ...args);
-}
-
-function sub(...args) {
-  return makeNode("sub", ...args);
-}
-
-function button(...args) {
-  return makeNode("button", ...args);
-}
-
+const domNodeTypes = [
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "div",
+  "p",
+  "ul",
+  "li",
+  "img",
+  "a",
+  "span",
+  "form",
+  "input",
+  "sub",
+  "button",
+  "nav",
+];
 const NSElements = ["svg", "path", "defs", "marker", "polygon"];
-function svg(...args) {
-  return makeNode("svg", ...args);
-}
-
-function path(...args) {
-  return makeNode("path", ...args);
-}
-
-function defs(...args) {
-  return makeNode("defs", ...args);
-}
-
-function marker(...args) {
-  return makeNode("marker", ...args);
-}
-
-function polygon(...args) {
-  return makeNode("polygon", ...args);
-}
+const createMakeNodeFuncForType = (nodeType) => {
+  window[nodeType] = function (...args) {
+    return makeNode(nodeType, ...args);
+  };
+};
+const allNodeTypes = domNodeTypes.concat(NSElements);
+allNodeTypes.forEach((nodeType) => {
+  createMakeNodeFuncForType(nodeType);
+});

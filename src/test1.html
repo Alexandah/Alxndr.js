@@ -14,13 +14,11 @@
     <script type="module">
       import { Graph } from "./Graph.js";
       var graph = new Graph(500, 500);
-      var a = graph.addNode("0", { x: 50, y: 100 });
       var b = graph.addNode("1", { x: 100, y: 100 });
       var c = graph.addNode("2", { x: 75, y: 200 });
-      var ac = graph.addEdge(a, c);
       var bc = graph.addEdge(b, c);
-      graph.removeNode(c);
-      alxndrDOM(graph.view);
+      // alxndrDOM(graph.view);
+      alxndrDOM(div([p("yeet"), graph.view]));
     </script>
   </body>
 </html>
