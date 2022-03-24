@@ -61,6 +61,9 @@
         ),
         div({ style: { float: "left", border: "1px solid red" } }, graph.view),
       ]);
+      document.addEventListener("keydown", (event) => {
+        console.log("found keydown event: ", event);
+      });
     </script>
     <script
       noHop

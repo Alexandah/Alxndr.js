@@ -18,6 +18,16 @@ function removeItemFromArray(item, array) {
   if (i != -1) array.splice(i, 1);
 }
 
+//Applies the same proxy handler to an object and all of its sub-objects
+function makePanopticonProxy(obj, handler) {
+  Object.keys(obj).forEach((key) => {
+    const val = obj[key];
+    const isObj = typeof val === "object" && val !== null;
+    if (isObj) obj[key] = makePanopticonProxy(val, handler);
+  });
+  return new Proxy(obj, handler);
+}
+
 //Attaches nodes to the document body
 function alxndrDOM(bodyChildren) {
   if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
