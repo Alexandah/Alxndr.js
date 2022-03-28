@@ -1,6 +1,6 @@
 import "./Alxndr.js";
 
-export class GraphNode extends AlxNode {
+class GraphNode extends AlxNode {
   constructor(content, startPos = { x: 0, y: 0 }) {
     super(
       div(
@@ -34,7 +34,7 @@ function arrow(start, end, width = 3, color = "black") {
     "marker-end": "url(#arrowhead)",
   });
 }
-export class GraphEdge extends AlxNode {
+class GraphEdge extends AlxNode {
   constructor(fromNode, toNode) {
     super(arrow(fromNode.position, toNode.position, 1));
     this.fromNode = fromNode;
@@ -68,6 +68,27 @@ function arrowhead() {
     polygon({ points: "0 0, 10 3.5, 0 7" })
   );
 }
+function editorOption(title, action) {
+  return button({ onclick: () => action() }, title);
+}
+function editorTab(options, x = 0, y = 0) {
+  const tab = div(
+    {
+      style: {
+        yesHop: "",
+        border: "1px solid black",
+        position: "absolute",
+        top: y + "px",
+        left: x + "px",
+      },
+    },
+    options
+  );
+  ["click", "contextmenu"].forEach((eType) =>
+    tab.addEventListener(eType, () => tab.remove())
+  );
+  return tab;
+}
 export class Graph {
   constructor(sizeX, sizeY) {
     this.drawRegion = svg(
@@ -96,10 +117,29 @@ export class Graph {
     );
     this.nodes = [];
     this.edges = [];
+    this.openEditorMenu = null;
   }
 
   addNode(content, spawnPos = { x: 0, y: 0 }) {
     var node = new GraphNode(content, spawnPos);
+    node.node.oncontextmenu = () => {
+      if (this.openEditorMenu != null) this.openEditorMenu.remove();
+      const tab = editorTab(
+        [
+          editorOption("Delete", () => {
+            console.log("deleting node!");
+            this.removeNode(node);
+          }),
+          editorOption("Create Edge", () => {
+            console.log("creating edge!");
+          }),
+        ],
+        20,
+        20
+      );
+      this.openEditorMenu = tab;
+      node.node.appendChild(tab);
+    };
     this.nodes.push(node);
     this.view.appendChild(node.node);
     return node;
@@ -119,6 +159,31 @@ export class Graph {
 
   addEdge(from, to) {
     var edge = new GraphEdge(from, to);
+    const offset = {
+      x: (edge.fromNode.position.x + edge.toNode.position.x) / 2,
+      y: (edge.fromNode.position.y + edge.toNode.position.y) / 2,
+    };
+    edge.node.oncontextmenu = () => {
+      if (this.openEditorMenu != null) this.openEditorMenu.remove();
+      const tab = editorTab(
+        [
+          editorOption("Delete", () => {
+            console.log("deleting edge!");
+            this.removeEdge(edge);
+          }),
+          editorOption("Move Start", () => {
+            console.log("moving edge start!");
+          }),
+          editorOption("Move Dest", () => {
+            console.log("moving edge dest!");
+          }),
+        ],
+        offset.x,
+        offset.y
+      );
+      this.openEditorMenu = tab;
+      this.view.appendChild(tab);
+    };
     edge.fromNode.connectedEdges.push(edge);
     edge.toNode.connectedEdges.push(edge);
     this.edges.push(edge);

@@ -16,11 +16,12 @@
   <body>
     <script noHop src="./Alxndr.js"></script>
     <script noHop type="module">
-      import { Graph } from "./Graph.js";
+      import { Graph } from "./ToDoGraph.js";
       var graph = new Graph(screen.width * 0.7, 1000);
-      var b = graph.addNode("1", { x: 100, y: 100 });
-      var c = graph.addNode("2", { x: 75, y: 200 });
+      var b = graph.addNode(p("1"), { x: 100, y: 100 });
+      var c = graph.addNode(p("2"), { x: 75, y: 200 });
       var bc = graph.addEdge(b, c);
+
       alxndrDOM([
         nav(
           {
@@ -59,16 +60,22 @@
             ]),
           ]
         ),
-        div({ style: { float: "left", border: "1px solid red" } }, graph.view),
+        div(
+          { noHop: "", style: { float: "left", border: "1px solid red" } },
+          graph.view
+        ),
       ]);
-      document.addEventListener("keydown", (event) => {
-        console.log("found keydown event: ", event);
-      });
+      // document.addEventListener("keydown", (event) => {
+      //   console.log("found keydown event: ", event);
+      // });
     </script>
-    <script
-      noHop
+    <!-- <script
       type="module"
-      src="https://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype@b05b25ec548bef54b5312bbd66e78d47a653efe2/DOMHopper/src/DOMHopperControls.js"
+      src="http://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype/DOMHopper/src/DOMHopperControls.js"
+    ></script> -->
+    <script
+      type="module"
+      src="http://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype@v0.4.1/DOMHopper/src/DOMHopperControls.js"
     ></script>
   </body>
 </html>
