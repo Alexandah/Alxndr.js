@@ -5,8 +5,8 @@ class GraphNode extends AlxNode {
     super(
       div(
         {
+          canGrab: "",
           style: {
-            yesHop: "",
             position: "absolute",
             border: "1px solid black",
           },
@@ -111,6 +111,9 @@ export class Graph {
           width: sizeX + "px",
           height: sizeY + "px",
           border: "2px solid black",
+        },
+        onclick: () => {
+          this.addNode(input(), { x: sizeX / 2, y: sizeY / 2 });
         },
       },
       this.drawRegion

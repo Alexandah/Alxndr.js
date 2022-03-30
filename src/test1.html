@@ -15,12 +15,91 @@
 
   <body>
     <script noHop src="./Alxndr.js"></script>
+    <script type="module" src="./Controls.js"></script>
     <script noHop type="module">
       import { Graph } from "./ToDoGraph.js";
       var graph = new Graph(screen.width * 0.7, 1000);
-      var b = graph.addNode(p("1"), { x: 100, y: 100 });
-      var c = graph.addNode(p("2"), { x: 75, y: 200 });
+      var b = graph.addNode(input(), { x: 100, y: 100 });
+      var c = graph.addNode(input(), { x: 75, y: 200 });
       var bc = graph.addEdge(b, c);
+
+      //GRAB MODE
+      var MOVE_SPEED = 32;
+      const MOVE_SPEED_ADJUSTMENT_FACTOR = 2;
+
+      var inGrabMode = false;
+      function canGrab(node) {
+        return node.hasAttribute("canGrab");
+      }
+      controls.defWord([DEFAULT_MODE, GRAB], () => {
+        if (canGrab(domHopper.selected)) inGrabMode = true;
+      });
+      controls.defWord([GRAB_MODE, GRAB], () => {
+        inGrabMode = false;
+      });
+      controls.defWord([GRAB_MODE, ESC], () => {
+        inGrabMode = false;
+      });
+      controls.defWord([GRAB_MODE, INC], () => {
+        MOVE_SPEED *= MOVE_SPEED_ADJUSTMENT_FACTOR;
+        console.log("new move speed: ", MOVE_SPEED);
+      });
+      controls.defWord([GRAB_MODE, DEC], () => {
+        MOVE_SPEED /= MOVE_SPEED_ADJUSTMENT_FACTOR;
+        console.log("new move speed: ", MOVE_SPEED);
+      });
+      controls.defWord([GRAB_MODE, UP], () => {
+        const toMove = findAlxNodeOfDomNode(domHopper.selected);
+        toMove.position.y -= MOVE_SPEED;
+      });
+      controls.defWord([GRAB_MODE, DOWN], () => {
+        const toMove = findAlxNodeOfDomNode(domHopper.selected);
+        toMove.position.y += MOVE_SPEED;
+      });
+      controls.defWord([GRAB_MODE, RIGHT], () => {
+        const toMove = findAlxNodeOfDomNode(domHopper.selected);
+        toMove.position.x += MOVE_SPEED;
+      });
+      controls.defWord([GRAB_MODE, LEFT], () => {
+        const toMove = findAlxNodeOfDomNode(domHopper.selected);
+        toMove.position.x -= MOVE_SPEED;
+      });
+      controls.defWord([GRAB_MODE, PRIMARY_CLICK], () => {
+        domHopper.primaryClick();
+      });
+      controls.defWord([GRAB_MODE, SECONDARY_CLICK], () => {
+        domHopper.secondaryClick();
+        inGrabMode = false;
+      });
+      modeSettingsControls.defWord([GRAB_MODE], (event) => {
+        event.preventDefault();
+      });
+
+      //MAIN INPUT PARSER
+      window.parseRawInputIntoControlLanguage = () => {
+        var editingMode = domHopper.editingMode ? EDITING_MODE : false;
+        var defaultMode = !editingMode && !inGrabMode ? DEFAULT_MODE : false;
+        var grabMode = inGrabMode && !editingMode ? GRAB_MODE : false;
+        var modes = [defaultMode, editingMode, grabMode];
+        var keys = keyboardParser.keys();
+        const removeUnwantedDuplicates = (list) => {
+          var seen = {};
+          return list.filter((item) => {
+            var key = item;
+            if (TOKEN_ALLOWS_DUPLICATES[key]) {
+              return true;
+            }
+            if (seen[key]) {
+              return false;
+            }
+            seen[key] = true;
+            return true;
+          });
+        };
+        keys = removeUnwantedDuplicates(keys);
+        var tokens = [...keys, ...modes];
+        return tokens.filter((x) => x);
+      };
 
       alxndrDOM([
         nav(
@@ -44,7 +123,7 @@
                 button(
                   {
                     onclick: () => {
-                      console.log("yeet");
+                      console.log(domHopper);
                     },
                   },
                   "fuck off"
@@ -65,17 +144,6 @@
           graph.view
         ),
       ]);
-      // document.addEventListener("keydown", (event) => {
-      //   console.log("found keydown event: ", event);
-      // });
     </script>
-    <!-- <script
-      type="module"
-      src="http://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype/DOMHopper/src/DOMHopperControls.js"
-    ></script> -->
-    <script
-      type="module"
-      src="http://cdn.jsdelivr.net/gh/Alexandah/mOuSe_prototype@v0.4.1/DOMHopper/src/DOMHopperControls.js"
-    ></script>
   </body>
 </html>

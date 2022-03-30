@@ -58,11 +58,20 @@ class ProxyDOMNode {
   }
 }
 
-//THIS SHOULD NOT BE TOUCHED BY ANYONE ELSE EXCEPT ALXNODE
+//THIS SHOULD NOT BE TOUCHED BY ANYONE ELSE OUTSIDE OF ALXNDR.JS
 var AlxndrDOM = {
   root: document.body,
   alxNodes: {},
 };
+
+function findAlxNodeOfDomNode(domNode) {
+  for (const i in Object.values(AlxndrDOM.alxNodes)) {
+    const alxNodeData = AlxndrDOM.alxNodes[i];
+    const alxNode = alxNodeData.alxNode;
+    if (alxNode.node === domNode) return alxNode;
+  }
+  return null;
+}
 
 //Supports dynamic dom nodes.
 //Allows associating non-dom variables with a domnode,
