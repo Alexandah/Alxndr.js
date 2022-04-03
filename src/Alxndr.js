@@ -14,6 +14,7 @@ function isNode(o) {
 }
 
 function removeItemFromArray(item, array) {
+  if (array == null || array == undefined || array.length == 0) return;
   const i = array.indexOf(item);
   if (i != -1) array.splice(i, 1);
 }
@@ -101,7 +102,8 @@ class AlxNode {
           case "destroy":
             break;
           default:
-            if (isStdObj(value))
+            if (isStdObj(value)) {
+              console.log("AlxNode setter wrapping obj in proxy: ", value);
               target[key] = new Proxy(value, {
                 set: (objTarget, objKey, objVal) => {
                   objTarget[objKey] = objVal;
@@ -109,7 +111,8 @@ class AlxNode {
                   return true;
                 },
               });
-            else {
+              this.tryRender();
+            } else {
               target[key] = value;
               this.tryRender();
             }

@@ -87,6 +87,7 @@ function editorTab(options, x = 0, y = 0) {
   ["click", "contextmenu"].forEach((eType) =>
     tab.addEventListener(eType, () => tab.remove())
   );
+  domHopper.setSelected(options[0]);
   return tab;
 }
 export class Graph {
@@ -112,15 +113,18 @@ export class Graph {
           height: sizeY + "px",
           border: "2px solid black",
         },
-        onclick: () => {
-          this.addNode(input(), { x: sizeX / 2, y: sizeY / 2 });
-        },
+        // onclick: () => {
+        //   this.addNode(input(), { x: sizeX / 2, y: sizeY / 2 });
+        // },
       },
       this.drawRegion
     );
     this.nodes = [];
     this.edges = [];
     this.openEditorMenu = null;
+    this.creatingEdgeFrom = null;
+    this.movingEdgeStart = null;
+    this.movingEdgeDest = null;
   }
 
   addNode(content, spawnPos = { x: 0, y: 0 }) {
@@ -130,11 +134,10 @@ export class Graph {
       const tab = editorTab(
         [
           editorOption("Delete", () => {
-            console.log("deleting node!");
             this.removeNode(node);
           }),
           editorOption("Create Edge", () => {
-            console.log("creating edge!");
+            this.beginEdgeCreation(node);
           }),
         ],
         20,
@@ -143,8 +146,15 @@ export class Graph {
       this.openEditorMenu = tab;
       node.node.appendChild(tab);
     };
+    node.node.onclick = () => {
+      this.endMoveEdgeStart();
+      this.endMoveEdgeDest();
+      if (this.creatingEdgeFrom === node) return;
+      this.endEdgeCreation();
+    };
     this.nodes.push(node);
     this.view.appendChild(node.node);
+    domHopper.setSelected(node.node);
     return node;
   }
   removeNode(node) {
@@ -154,9 +164,18 @@ export class Graph {
       //creating copy bc otherwise the list we are removing from is trimmed as we go,
       //causing early termination and failure to remove some edges
       const edgesToRemove = node.connectedEdges.map((edge) => edge);
-      edgesToRemove.forEach((edge) => this.removeEdge(edge));
       this.nodes.splice(nodeIndex, 1);
+      //setting next selected node
+      if (node.connectedEdges.length > 0) {
+        const edge = node.connectedEdges[0];
+        const isFromNode = edge.fromNode === this;
+        domHopper.setSelected(
+          isFromNode ? edge.toNode.node : edge.fromNode.node
+        );
+      } else if (this.nodes.length > 0)
+        domHopper.setSelected(this.nodes[0].node);
       node.destroy();
+      edgesToRemove.forEach((edge) => this.removeEdge(edge));
     }
   }
 
@@ -171,14 +190,15 @@ export class Graph {
       const tab = editorTab(
         [
           editorOption("Delete", () => {
-            console.log("deleting edge!");
+            //set next selected item
+            domHopper.setSelected(edge.fromNode.node);
             this.removeEdge(edge);
           }),
           editorOption("Move Start", () => {
-            console.log("moving edge start!");
+            this.beginMoveEdgeStart(edge);
           }),
           editorOption("Move Dest", () => {
-            console.log("moving edge dest!");
+            this.beginMoveEdgeDest(edge);
           }),
         ],
         offset.x,
@@ -192,6 +212,47 @@ export class Graph {
     this.edges.push(edge);
     this.drawRegion.appendChild(edge.node);
     return edge;
+  }
+
+  beginEdgeCreation(startNode) {
+    this.creatingEdgeFrom = startNode;
+    domHopper.setSelected(startNode.node);
+  }
+  endEdgeCreation() {
+    if (this.creatingEdgeFrom == null) return;
+    const dest = findAlxNodeOfDomNode(domHopper.selected);
+    this.addEdge(this.creatingEdgeFrom, dest);
+    this.creatingEdgeFrom = null;
+  }
+
+  beginMoveEdgeStart(edge) {
+    if (this.movingEdgeDest != null) return;
+    this.movingEdgeStart = edge;
+    domHopper.setSelected(edge.fromNode.node);
+  }
+  endMoveEdgeStart() {
+    if (this.movingEdgeStart == null) return;
+    const newStart = findAlxNodeOfDomNode(domHopper.selected);
+    this.movingEdgeStart.doesNotDependOn(this.movingEdgeStart.fromNode);
+    this.movingEdgeStart.fromNode = newStart;
+    this.movingEdgeStart.dependsOn(newStart);
+    console.log("modified edge to state: ", this.movingEdgeStart);
+    this.movingEdgeStart = null;
+  }
+
+  beginMoveEdgeDest(edge) {
+    if (this.movingEdgeStart != null) return;
+    this.movingEdgeDest = edge;
+    domHopper.setSelected(edge.toNode.node);
+  }
+  endMoveEdgeDest() {
+    if (this.movingEdgeDest == null) return;
+    const newDest = findAlxNodeOfDomNode(domHopper.selected);
+    this.movingEdgeDest.doesNotDependOn(this.movingEdgeDest.toNode);
+    this.movingEdgeDest.toNode = newDest;
+    this.movingEdgeDest.dependsOn(newDest);
+    console.log("modified edge to state: ", this.movingEdgeDest);
+    this.movingEdgeDest = null;
   }
 
   removeEdge(edge) {

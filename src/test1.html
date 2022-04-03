@@ -21,7 +21,8 @@
       var graph = new Graph(screen.width * 0.7, 1000);
       var b = graph.addNode(input(), { x: 100, y: 100 });
       var c = graph.addNode(input(), { x: 75, y: 200 });
-      var bc = graph.addEdge(b, c);
+      var d = graph.addNode(input(), { x: 400, y: 100 });
+      // var bc = graph.addEdge(b, c);
 
       //GRAB MODE
       var MOVE_SPEED = 32;
@@ -42,27 +43,29 @@
       });
       controls.defWord([GRAB_MODE, INC], () => {
         MOVE_SPEED *= MOVE_SPEED_ADJUSTMENT_FACTOR;
-        console.log("new move speed: ", MOVE_SPEED);
       });
       controls.defWord([GRAB_MODE, DEC], () => {
         MOVE_SPEED /= MOVE_SPEED_ADJUSTMENT_FACTOR;
-        console.log("new move speed: ", MOVE_SPEED);
       });
       controls.defWord([GRAB_MODE, UP], () => {
         const toMove = findAlxNodeOfDomNode(domHopper.selected);
         toMove.position.y -= MOVE_SPEED;
+        domHopper.selected.scrollIntoView();
       });
       controls.defWord([GRAB_MODE, DOWN], () => {
         const toMove = findAlxNodeOfDomNode(domHopper.selected);
         toMove.position.y += MOVE_SPEED;
+        domHopper.selected.scrollIntoView();
       });
       controls.defWord([GRAB_MODE, RIGHT], () => {
         const toMove = findAlxNodeOfDomNode(domHopper.selected);
         toMove.position.x += MOVE_SPEED;
+        domHopper.selected.scrollIntoView();
       });
       controls.defWord([GRAB_MODE, LEFT], () => {
         const toMove = findAlxNodeOfDomNode(domHopper.selected);
         toMove.position.x -= MOVE_SPEED;
+        domHopper.selected.scrollIntoView();
       });
       controls.defWord([GRAB_MODE, PRIMARY_CLICK], () => {
         domHopper.primaryClick();
