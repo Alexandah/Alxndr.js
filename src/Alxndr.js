@@ -19,16 +19,6 @@ function removeItemFromArray(item, array) {
   if (i != -1) array.splice(i, 1);
 }
 
-//Applies the same proxy handler to an object and all of its sub-objects
-function makePanopticonProxy(obj, handler) {
-  Object.keys(obj).forEach((key) => {
-    const val = obj[key];
-    const isObj = typeof val === "object" && val !== null;
-    if (isObj) obj[key] = makePanopticonProxy(val, handler);
-  });
-  return new Proxy(obj, handler);
-}
-
 //Attaches nodes to the document body
 function alxndrDOM(bodyChildren) {
   if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
@@ -38,7 +28,8 @@ function alxndrDOM(bodyChildren) {
 //Allows interacting with a domnode through
 //a more aesthetically pleasing and simple syntax
 class ProxyDOMNode {
-  constructor(domNode) {
+  constructor(domNode, postSetFunc = () => {}) {
+    domNode.alxNode = true;
     return new Proxy(domNode, {
       set: (target, key, value) => {
         if (key in target) {
@@ -48,14 +39,67 @@ class ProxyDOMNode {
             });
           else target[key] = value;
         } else target.setAttribute(key, value);
+        postSetFunc();
         return true;
       },
       get: (target, key) => {
-        if (key == "node") return target;
+        if (key == "raw") return target;
         if (key in target) return target[key];
         else return target.getAttribute(key);
       },
     });
+  }
+}
+
+//stripped down version for prototyping the new one
+class PanopticAlxNode {
+  constructor(domNode) {
+    const getPanopticReplacement = (value) => {
+      const isAlxProxy = "alxProxy" in value;
+      const isObj = typeof value === "object" && value !== null;
+      const isNode = isNode(value);
+      if (isAlxProxy) return value;
+      else if (isNode) return new ProxyDOMNode(value, () => this.render());
+      else if (isObj) {
+        const obj = value;
+        Object.keys(obj).forEach((key) => {
+          obj[key] = getPanopticReplacement(obj[key]);
+        });
+        obj.alxProxy = true;
+        return new Proxy(obj, panopticHandler);
+      } else return value;
+    };
+    const panopticHandler = {
+      set: (target, key, value) => {
+        target[key] = getPanopticReplacement(value);
+        this.render();
+        return true;
+      },
+    };
+    const alxNodeHandler = {
+      set: (target, key, value) => {
+        switch (key) {
+          case "id":
+          case "domNode":
+          case "destroy":
+            break;
+          default:
+            panopticHandler.set(target, key, value);
+            break;
+        }
+        return true;
+      },
+    };
+    this.id = makeGuid();
+    this.domNode = new ProxyDOMNode(domNode, () => this.render());
+    this.destroy = function () {
+      this.domNode.raw.remove();
+      Object.keys(this).forEach((k) => {
+        delete this[k];
+      });
+    };
+    this.render = function () {};
+    return new Proxy(this, alxNodeHandler);
   }
 }
 
@@ -69,7 +113,7 @@ function findAlxNodeOfDomNode(domNode) {
   for (const i in Object.values(AlxndrDOM.alxNodes)) {
     const alxNodeData = AlxndrDOM.alxNodes[i];
     const alxNode = alxNodeData.alxNode;
-    if (alxNode.node === domNode) return alxNode;
+    if (alxNode.domNode === domNode) return alxNode;
   }
   return null;
 }
@@ -103,7 +147,6 @@ class AlxNode {
             break;
           default:
             if (isStdObj(value)) {
-              console.log("AlxNode setter wrapping obj in proxy: ", value);
               target[key] = new Proxy(value, {
                 set: (objTarget, objKey, objVal) => {
                   objTarget[objKey] = objVal;
@@ -111,17 +154,14 @@ class AlxNode {
                   return true;
                 },
               });
-              this.tryRender();
-            } else {
-              target[key] = value;
-              this.tryRender();
-            }
+            } else target[key] = value;
+            this.tryRender();
             break;
         }
         return true;
       },
       get: (target, key) => {
-        if (key == "node") return this.nodeData.node;
+        if (key == "domNode") return this.nodeData.node;
         else return target[key];
       },
     });
@@ -164,6 +204,8 @@ class AlxNode {
       x.alxNode.doesNotDependOn(this);
     });
   }
+
+  dependsOnProperty(propertyName) {}
 }
 
 function makeNode(type) {
@@ -230,6 +272,7 @@ function makeNode(type) {
   children.forEach((child) => {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);
+    else if (child instanceof AlxNode) toAdd = child.domNode;
     else toAdd = child;
     node.appendChild(toAdd);
   });
