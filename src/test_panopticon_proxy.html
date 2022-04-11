@@ -6,6 +6,56 @@
 
   <body>
     <script src="./Alxndr.js"></script>
-    <script></script>
+    <script>
+      class SpazzyText extends PanopticAlxNode {
+        constructor(text, interval = 100) {
+          super(p(text));
+          this.info = {
+            textInfo: {
+              text: text,
+            },
+            interval: interval,
+          };
+          this.render = () => {
+            this.domNode.textContent = this.info.textInfo.text;
+          };
+          setInterval(() => {
+            this.spazText();
+          }, this.info.interval);
+        }
+
+        spazText() {
+          this.info.textInfo.text = this.info.textInfo.text
+            .split("")
+            .reverse()
+            .join("");
+        }
+      }
+
+      class AwesomeDiv extends PanopticAlxNode {
+        constructor(color0, color1, children = [], interval = 100) {
+          super(div(children));
+          this.color0 = color0;
+          this.color1 = color1;
+          this.activeColor = this.color0;
+          this.render = () => {
+            this.domNode.style = { border: "3px solid " + this.activeColor };
+          };
+          setInterval(() => {
+            this.switchColor();
+          }, interval);
+        }
+
+        switchColor() {
+          if (this.activeColor == this.color0) this.activeColor = this.color1;
+          else this.activeColor = this.color0;
+        }
+      }
+
+      alxndrDOM(
+        new AwesomeDiv("red", "blue", new SpazzyText("Alxndr.js").domNode.raw)
+          .domNode.raw
+      );
+    </script>
   </body>
 </html>

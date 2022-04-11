@@ -19,8 +19,25 @@ function removeItemFromArray(item, array) {
   if (i != -1) array.splice(i, 1);
 }
 
+function makeGuid() {
+  let d = new Date().getTime(),
+    d2 = (performance && performance.now && performance.now() * 1000) || 0;
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    let r = Math.random() * 16;
+    if (d > 0) {
+      r = (d + r) % 16 | 0;
+      d = Math.floor(d / 16);
+    } else {
+      r = (d2 + r) % 16 | 0;
+      d2 = Math.floor(d2 / 16);
+    }
+    return (c == "x" ? r : (r & 0x7) | 0x8).toString(16);
+  });
+}
+
 //Attaches nodes to the document body
 function alxndrDOM(bodyChildren) {
+  console.log("alxndrDOM input: ", bodyChildren);
   if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
   bodyChildren.forEach((child) => document.body.appendChild(child));
 }
@@ -28,7 +45,7 @@ function alxndrDOM(bodyChildren) {
 //Allows interacting with a domnode through
 //a more aesthetically pleasing and simple syntax
 class ProxyDOMNode {
-  constructor(domNode, postSetFunc = () => {}) {
+  constructor(domNode) {
     domNode.alxNode = true;
     return new Proxy(domNode, {
       set: (target, key, value) => {
@@ -39,7 +56,6 @@ class ProxyDOMNode {
             });
           else target[key] = value;
         } else target.setAttribute(key, value);
-        postSetFunc();
         return true;
       },
       get: (target, key) => {
@@ -55,11 +71,10 @@ class ProxyDOMNode {
 class PanopticAlxNode {
   constructor(domNode) {
     const getPanopticReplacement = (value) => {
-      const isAlxProxy = "alxProxy" in value;
+      const isAlxProxy = typeof value === "object" && "alxProxy" in value;
       const isObj = typeof value === "object" && value !== null;
-      const isNode = isNode(value);
       if (isAlxProxy) return value;
-      else if (isNode) return new ProxyDOMNode(value, () => this.render());
+      else if (isNode(value)) return new ProxyDOMNode(value);
       else if (isObj) {
         const obj = value;
         Object.keys(obj).forEach((key) => {
@@ -240,6 +255,7 @@ function makeNode(type) {
     var node = document.createElementNS("http://www.w3.org/2000/svg", type);
   else var node = document.createElement(type);
 
+  console.log(attributes);
   Object.entries(attributes).forEach(([k, v]) => {
     switch (k) {
       case "class":
@@ -269,10 +285,12 @@ function makeNode(type) {
     node.setAttribute(k, v);
   });
 
+  console.log(children);
   children.forEach((child) => {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);
     else if (child instanceof AlxNode) toAdd = child.domNode;
+    else if (child instanceof PanopticAlxNode) toAdd = child.domNode;
     else toAdd = child;
     node.appendChild(toAdd);
   });
