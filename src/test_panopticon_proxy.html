@@ -7,7 +7,7 @@
   <body>
     <script src="./Alxndr.js"></script>
     <script>
-      class SpazzyText extends PanopticAlxNode {
+      class SpazzyText extends AlxNode {
         constructor(text, interval = 100) {
           super(p(text));
           this.info = {
@@ -32,7 +32,7 @@
         }
       }
 
-      class AwesomeDiv extends PanopticAlxNode {
+      class AwesomeDiv extends AlxNode {
         constructor(color0, color1, children = [], interval = 100) {
           super(div(children));
           this.color0 = color0;
@@ -52,7 +52,51 @@
         }
       }
 
-      alxndrDOM(new AwesomeDiv("red", "blue", new SpazzyText("Alxndr.js")));
+      class Yeeter extends AlxNode {
+        constructor(initialText, child) {
+          super(div([p(initialText), child]));
+          this.render = () => {
+            this.domNode.textContent = child.message;
+          };
+        }
+      }
+
+      class AlxButton extends AlxNode {
+        constructor(text) {
+          super(
+            button(
+              {
+                onclick: () => {
+                  this.clicked = true;
+                  this.message =
+                    this.message.slice(0, 1) + "E" + this.message.slice(1);
+                },
+              },
+              text
+            )
+          );
+          this.render = () => {
+            this.domNode.textContent = this.message;
+          };
+          this.clicked = false;
+          this.message = "YEET!";
+        }
+      }
+
+      var button = new AlxButton("click to make shit happen");
+      var yeeter = new Yeeter("i am stupid", button);
+      yeeter.dependsOn(button);
+
+      alxndrDOM([
+        new AwesomeDiv("red", "blue", new SpazzyText("Alxndr.js")),
+        div("kek"),
+        div("kek"),
+        div("kek"),
+        div("kek"),
+        div("kek"),
+        button,
+        yeeter,
+      ]);
     </script>
   </body>
 </html>
