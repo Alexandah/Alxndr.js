@@ -37,16 +37,18 @@ function makeGuid() {
 
 //Attaches nodes to the document body
 function alxndrDOM(bodyChildren) {
-  console.log("alxndrDOM input: ", bodyChildren);
   if (!Array.isArray(bodyChildren)) bodyChildren = [bodyChildren];
-  bodyChildren.forEach((child) => document.body.appendChild(child));
+  bodyChildren.forEach((child) => {
+    if ("alxProxy" in child) child = child.domNode.raw;
+    document.body.appendChild(child);
+  });
 }
 
 //Allows interacting with a domnode through
 //a more aesthetically pleasing and simple syntax
 class ProxyDOMNode {
   constructor(domNode) {
-    domNode.alxNode = true;
+    domNode.alxProxy = true;
     return new Proxy(domNode, {
       set: (target, key, value) => {
         if (key in target) {
@@ -71,8 +73,8 @@ class ProxyDOMNode {
 class PanopticAlxNode {
   constructor(domNode) {
     const getPanopticReplacement = (value) => {
-      const isAlxProxy = typeof value === "object" && "alxProxy" in value;
       const isObj = typeof value === "object" && value !== null;
+      const isAlxProxy = isObj && "alxProxy" in value;
       if (isAlxProxy) return value;
       else if (isNode(value)) return new ProxyDOMNode(value);
       else if (isObj) {
@@ -95,6 +97,7 @@ class PanopticAlxNode {
       set: (target, key, value) => {
         switch (key) {
           case "id":
+          case "alxProxy":
           case "domNode":
           case "destroy":
             break;
@@ -106,6 +109,7 @@ class PanopticAlxNode {
       },
     };
     this.id = makeGuid();
+    this.alxProxy = true;
     this.domNode = new ProxyDOMNode(domNode, () => this.render());
     this.destroy = function () {
       this.domNode.raw.remove();
@@ -230,7 +234,7 @@ function makeNode(type) {
   var children = null;
   for (var i = 1; i < arguments.length; i++) {
     let arg = arguments[i];
-    if (isStdObj(arg) && !isNode(arg)) {
+    if (isStdObj(arg) && !isNode(arg) && !("alxProxy" in arg)) {
       if (attributes != null)
         throw "Alxndr.js Error: Tried to set attributes twice.";
       attributes = arg;
@@ -255,7 +259,6 @@ function makeNode(type) {
     var node = document.createElementNS("http://www.w3.org/2000/svg", type);
   else var node = document.createElement(type);
 
-  console.log(attributes);
   Object.entries(attributes).forEach(([k, v]) => {
     switch (k) {
       case "class":
@@ -285,12 +288,11 @@ function makeNode(type) {
     node.setAttribute(k, v);
   });
 
-  console.log(children);
   children.forEach((child) => {
     let toAdd;
     if (typeof child === "string") toAdd = document.createTextNode(child);
-    else if (child instanceof AlxNode) toAdd = child.domNode;
-    else if (child instanceof PanopticAlxNode) toAdd = child.domNode;
+    else if (child instanceof AlxNode) toAdd = child.domNode.raw;
+    else if (child instanceof PanopticAlxNode) toAdd = child.domNode.raw;
     else toAdd = child;
     node.appendChild(toAdd);
   });
