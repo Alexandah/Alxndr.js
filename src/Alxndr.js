@@ -76,15 +76,11 @@ var AlxndrDOM = {
 };
 
 function findAlxNodeOfDomNode(domNode) {
-  for (const i in Object.values(AlxndrDOM.alxNodes)) {
-    const alxNodeData = AlxndrDOM.alxNodes[i];
-    const alxNode = alxNodeData.alxNode;
-    if (alxNode.domNode === domNode) return alxNode;
-  }
+  if (domNode.id in AlxndrDOM.alxNodes)
+    return AlxndrDOM.alxNodes[domNode.id].alxNode;
   return null;
 }
 
-//stripped down version for prototyping the new one
 class AlxNode {
   constructor(domNode) {
     const getPanopticReplacement = (value) => {
@@ -126,6 +122,7 @@ class AlxNode {
     this.id = makeGuid();
     this.alxProxy = true;
     this.domNode = new ProxyDOMNode(domNode, () => this.tryRender());
+    this.domNode.id = this.id;
     this.destroy = function () {
       this.onDestroy();
       this.removeAllDependencies();
