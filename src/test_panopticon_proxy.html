@@ -47,8 +47,8 @@
               children
             )
           );
-          this.dependsOnProperty("watching");
           this.watching = watching;
+          this.dependsOnProperty("watching");
           this.render = () => {
             this.switch();
           };

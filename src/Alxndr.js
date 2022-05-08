@@ -184,9 +184,11 @@ class AlxNode {
 
   dependsOnProperty(property) {
     this.dependsOnObjInProps.push(property);
+    if (property in this) this.dependsOn(this[property]);
   }
   doesNotDependOnProperty(property) {
     removeItemFromArray(property, this.dependsOnObjInProps);
+    if (property in this) this.doesNotDependOn(this[property]);
   }
 }
 
