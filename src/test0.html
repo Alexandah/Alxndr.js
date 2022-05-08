@@ -83,7 +83,7 @@
           x: 100,
           y: 100,
         },
-        ["I like to move it move it!", new FlashingDiv("black", "orange").node]
+        ["I like to move it move it!", new FlashingDiv("black", "orange")]
       );
 
       function controlButton(text, func) {
@@ -102,7 +102,7 @@
         controlButton("LEFT", () => movingDiv.moveLeft()),
         controlButton("RIGHT", () => movingDiv.moveRight()),
         controlButton("DELETE", () => movingDiv.destroy()),
-        movingDiv.node,
+        movingDiv,
       ]);
     </script>
   </body>

@@ -19,6 +19,10 @@ function removeItemFromArray(item, array) {
   if (i != -1) array.splice(i, 1);
 }
 
+function itemInArray(item, array) {
+  return array.indexOf(item) != -1;
+}
+
 function makeGuid() {
   let d = new Date().getTime(),
     d2 = (performance && performance.now && performance.now() * 1000) || 0;
@@ -99,7 +103,10 @@ class AlxNode {
     };
     const panopticHandler = {
       set: (target, key, value) => {
+        const dependsOnPropToSet = itemInArray(key, this.dependsOnObjInProps);
+        if (dependsOnPropToSet) this.doesNotDependOn(target[key]);
         target[key] = getPanopticReplacement(value);
+        if (dependsOnPropToSet) this.dependsOn(value);
         this.tryRender();
         return true;
       },
@@ -121,8 +128,9 @@ class AlxNode {
     };
     this.id = makeGuid();
     this.alxProxy = true;
-    this.domNode = new ProxyDOMNode(domNode, () => this.tryRender());
+    this.domNode = new ProxyDOMNode(domNode);
     this.domNode.id = this.id;
+    this.dependsOnObjInProps = [];
     this.destroy = function () {
       this.onDestroy();
       this.removeAllDependencies();
@@ -172,6 +180,13 @@ class AlxNode {
     Object.values(AlxndrDOM.alxNodes).forEach((x) => {
       x.alxNode.doesNotDependOn(this);
     });
+  }
+
+  dependsOnProperty(property) {
+    this.dependsOnObjInProps.push(property);
+  }
+  doesNotDependOnProperty(property) {
+    removeItemFromArray(property, this.dependsOnObjInProps);
   }
 }
 

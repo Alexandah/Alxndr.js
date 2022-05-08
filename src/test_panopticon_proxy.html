@@ -7,95 +7,84 @@
   <body>
     <script src="./Alxndr.js"></script>
     <script>
-      class SpazzyText extends AlxNode {
-        constructor(text, interval = 100) {
-          super(p(text));
-          this.info = {
-            textInfo: {
-              text: text,
-            },
-            interval: interval,
-          };
-          this.render = () => {
-            this.domNode.textContent = this.info.textInfo.text;
-          };
-          setInterval(() => {
-            this.spazText();
-          }, this.info.interval);
-        }
-
-        spazText() {
-          this.info.textInfo.text = this.info.textInfo.text
-            .split("")
-            .reverse()
-            .join("");
-        }
-      }
-
-      class AwesomeDiv extends AlxNode {
-        constructor(color0, color1, children = [], interval = 100) {
-          super(div(children));
-          this.color0 = color0;
-          this.color1 = color1;
-          this.activeColor = this.color0;
-          this.render = () => {
-            this.domNode.style = { border: "3px solid " + this.activeColor };
-          };
-          setInterval(() => {
-            this.switchColor();
-          }, interval);
-        }
-
-        switchColor() {
-          if (this.activeColor == this.color0) this.activeColor = this.color1;
-          else this.activeColor = this.color0;
-        }
-      }
-
-      class Yeeter extends AlxNode {
-        constructor(initialText, child) {
-          super(div([p(initialText), child]));
-          this.render = () => {
-            this.domNode.textContent = child.message;
-          };
-        }
-      }
-
-      class AlxButton extends AlxNode {
-        constructor(text) {
+      class MoveableDiv extends AlxNode {
+        constructor(x, y, children = []) {
           super(
-            button(
+            div(
               {
-                onclick: () => {
-                  this.clicked = true;
-                  this.message =
-                    this.message.slice(0, 1) + "E" + this.message.slice(1);
+                style: {
+                  position: "fixed",
+                  left: x,
+                  top: y,
+                  width: "100px",
+                  height: "100px",
+                  border: "3px solid green",
                 },
               },
-              text
+              children
             )
           );
+          this.x = x;
+          this.y = y;
           this.render = () => {
-            this.domNode.textContent = this.message;
+            this.domNode.style = {
+              left: this.x + "px",
+              top: this.y + "px",
+            };
           };
-          this.clicked = false;
-          this.message = "YEET!";
         }
       }
 
-      var button = new AlxButton("click to make shit happen");
-      var yeeter = new Yeeter("i am stupid", button);
-      yeeter.dependsOn(button);
+      class WatcherDiv extends AlxNode {
+        constructor(watching, children = []) {
+          super(
+            div(
+              {
+                style: {
+                  border: "3px solid black",
+                },
+              },
+              children
+            )
+          );
+          this.dependsOnProperty("watching");
+          this.watching = watching;
+          this.render = () => {
+            this.switch();
+          };
+        }
+
+        switch() {
+          if (this.domNode.style.border == "3px solid black") {
+            this.domNode.style = {
+              border: "3px solid red",
+            };
+          } else {
+            this.domNode.style = {
+              border: "3px solid black",
+            };
+          }
+        }
+      }
+
+      var mover = new MoveableDiv(100, 100);
+      var watcher = new WatcherDiv(mover, p("im watching you, fuk boi"));
 
       alxndrDOM([
-        new AwesomeDiv("red", "blue", new SpazzyText("Alxndr.js")),
-        div("kek"),
-        div("kek"),
-        div("kek"),
-        div("kek"),
-        div("kek"),
-        button,
-        yeeter,
+        watcher,
+        button({ onclick: () => (mover.y += 30) }, "move down"),
+        button({ onclick: () => mover.destroy() }, "kill mover"),
+        button(
+          {
+            onclick: () => {
+              mover = new MoveableDiv(100, 100);
+              alxndrDOM(mover);
+              watcher.watching = mover;
+            },
+          },
+          "assign new mover"
+        ),
+        mover,
       ]);
     </script>
   </body>
