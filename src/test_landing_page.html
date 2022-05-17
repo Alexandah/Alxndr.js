@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Er & Alex</title>
+    <style></style>
+  </head>
+
+  <body>
+    <script src="./Alxndr.js"></script>
+    <script>
+      class ShrekState extends AlxNode {
+        constructor() {
+          super();
+          this.holyTitle = "";
+        }
+      }
+
+      var shrekState = new ShrekState();
+
+      class ShrekTitlePicker extends AlxNode {
+        constructor(title) {
+          super(div());
+          this.plate = h4("Shrek");
+          this.domNode.raw.appendChild(this.plate.raw);
+          this.domNode.raw.appendChild(
+            button(
+              {
+                onclick: () => {
+                  this.shrekState.holyTitle = title;
+                },
+              },
+              title
+            )
+          );
+          this.shrekState = shrekState;
+          this.dependsOn(shrekState);
+          this.render = () => {
+            this.plate.innerHTML = "Shrek" + this.shrekState.holyTitle;
+          };
+        }
+      }
+
+      function navLink(text, url) {
+        return a(
+          {
+            style: {
+              display: "inline-block",
+              position: "relative",
+              padding: "10px",
+            },
+            href: url,
+          },
+          text
+        );
+      }
+
+      function portrait(url, scale, title) {
+        return div(
+          {
+            style: {
+              margin: "10px",
+            },
+          },
+          [
+            img({
+              style: { border: "3px solid black" },
+              src: url,
+              width: scale,
+              height: "auto",
+            }),
+            p(
+              {
+                style: {
+                  margin: "auto",
+                  "font-style": "italic",
+                  "font-size": "1.2em",
+                },
+              },
+              title
+            ),
+          ]
+        );
+      }
+
+      function paper(leanDir, text) {
+        var percentFromLeft;
+        if (leanDir == "left") percentFromLeft = "10%";
+        else if (leanDir == "right") percentFromLeft = "70%";
+        else percentFromLeft = "50%";
+        return div(
+          {
+            style: {
+              margin: "10px",
+            },
+          },
+          span(
+            {
+              style: {
+                position: "relative",
+                left: percentFromLeft,
+                padding: "10px",
+                border: "1px solid black",
+              },
+              "inline-size": "50px",
+              "overflow-wrap": "break-all",
+            },
+            text
+          )
+        );
+      }
+
+      alxndrDOM([
+        main(
+          {
+            style: {
+              margin: "auto",
+              width: "65%",
+              height: "90vh",
+              border: "2px solid black",
+            },
+          },
+          [
+            h1(
+              {
+                style: {
+                  "text-decoration": "underline",
+                  padding: "10px",
+                },
+              },
+              "Er & Alex"
+            ),
+            nav([
+              navLink("Home", "./index.html"),
+              navLink("About", "./index.html"),
+              navLink("Blog", "./index.html"),
+            ]),
+            portrait(
+              "https://preview.redd.it/b3nv1dj0ihc61.jpg?auto=webp&s=bf89b1107db0c342df450b3c3fd900573b55b4cf",
+              "50%",
+              "Shrek, Love and Life"
+            ),
+            paper("left", ["I have a quite small penis"]),
+            paper("right", ["I have a quite small penis"]),
+            paper("left", [
+              "I have a quite small penis. This makes me very sad and makes me feel inadequate.",
+            ]),
+            p("useless text"),
+            new ShrekTitlePicker(" the Great"),
+            new ShrekTitlePicker(", Love and Life"),
+            new ShrekTitlePicker(" the Onionlord"),
+            new ShrekTitlePicker(", Slayer of Farquad"),
+          ]
+        ),
+      ]);
+    </script>
+  </body>
+</html>

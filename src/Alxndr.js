@@ -86,7 +86,7 @@ function findAlxNodeOfDomNode(domNode) {
 }
 
 class AlxNode {
-  constructor(domNode) {
+  constructor(domNode = div("PLACEHOLDER")) {
     const getPanopticReplacement = (value) => {
       const isObj = typeof value === "object" && value !== null;
       const isAlxProxy = isObj && "alxProxy" in value;
@@ -325,6 +325,7 @@ const domNodeTypes = [
   "menu",
   "menuitem",
   "meta",
+  "main",
   "meter",
   "nav",
   "object",
