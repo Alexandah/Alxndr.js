@@ -14,30 +14,32 @@
           this.holyTitle = "";
         }
       }
-
       var shrekState = new ShrekState();
 
-      class ShrekTitlePicker extends AlxNode {
-        constructor(title) {
-          super(div());
-          this.plate = h4("Shrek");
-          this.domNode.raw.appendChild(this.plate.raw);
-          this.domNode.raw.appendChild(
-            button(
-              {
-                onclick: () => {
-                  this.shrekState.holyTitle = title;
+      function shrekTitle(title) {
+        class ShrekTitlePicker extends AlxNode {
+          constructor() {
+            super(div());
+            this.plate = h4("Shrek");
+            this.domNode.raw.appendChild(this.plate.raw);
+            this.domNode.raw.appendChild(
+              button(
+                {
+                  onclick: () => {
+                    this.shrekState.holyTitle = title;
+                  },
                 },
-              },
-              title
-            )
-          );
-          this.shrekState = shrekState;
-          this.dependsOn(shrekState);
-          this.render = () => {
-            this.plate.innerHTML = "Shrek" + this.shrekState.holyTitle;
-          };
+                title
+              )
+            );
+            this.shrekState = shrekState;
+            this.dependsOn(shrekState);
+            this.render = () => {
+              this.plate.innerHTML = "Shrek" + this.shrekState.holyTitle;
+            };
+          }
         }
+        return new ShrekTitlePicker();
       }
 
       function navLink(text, url) {
@@ -145,10 +147,10 @@
               "I have a quite small penis. This makes me very sad and makes me feel inadequate.",
             ]),
             p("useless text"),
-            new ShrekTitlePicker(" the Great"),
-            new ShrekTitlePicker(", Love and Life"),
-            new ShrekTitlePicker(" the Onionlord"),
-            new ShrekTitlePicker(", Slayer of Farquad"),
+            shrekTitle(" the Great"),
+            shrekTitle(", Love and Life"),
+            shrekTitle(" the Onionlord"),
+            shrekTitle(", Slayer of Farquad"),
           ]
         ),
       ]);
